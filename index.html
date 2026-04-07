@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Soul Street Burger — Hambúrgueres artesanais feitos com alma. Guimarães."/>
+  <title>Soul Street Burger</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --black:  #080808;
+      --dark:   #111111;
+      --dark2:  #1a1a1a;
+      --orange: #E8511A;
+      --orange2:#ff6e38;
+      --cream:  #F0EBE1;
+      --muted:  #777;
+      --white:  #ffffff;
+      --font-d: 'Bebas Neue', sans-serif;
+      --font-b: 'Space Grotesk', sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--black); color: var(--cream); font-family: var(--font-b); overflow-x: hidden; cursor: none; }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--black); }
+    ::-webkit-scrollbar-thumb { background: var(--orange); }
+
+    /* CURSOR */
+    #cur { position: fixed; z-index: 9999; pointer-events: none; width: 12px; height: 12px; border-radius: 50%; background: var(--orange); transform: translate(-50%,-50%); transition: width .2s, height .2s; mix-blend-mode: difference; }
+    #cur-r { position: fixed; z-index: 9998; pointer-events: none; width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(232,81,26,.5); transform: translate(-50%,-50%); transition: all .12s ease; }
+
+    /* LOADER */
+    #loader { position: fixed; inset: 0; z-index: 1000; background: var(--black); display: flex; align-items: center; justify-content: center; transition: opacity .7s ease; }
+    #loader img { height: 60px; opacity: 0; animation: fadeIn .5s .2s ease forwards; }
+    #loader.out { opacity: 0; pointer-events: none; }
+    @keyframes fadeIn { to { opacity: 1; } }
+
+    /* NAV */
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 500; display: flex; align-items: center; justify-content: space-between; padding: 22px 5%; transition: all .4s ease; }
+    nav.solid { background: rgba(8,8,8,.93); backdrop-filter: blur(20px); padding: 14px 5%; border-bottom: 1px solid rgba(255,255,255,.06); }
+    .nav-logo img { height: 36px; }
+    .nav-links { display: flex; gap: 36px; list-style: none; }
+    .nav-links a { font-size: .77rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); transition: color .3s; font-weight: 500; }
+    .nav-links a:hover { color: var(--cream); }
+    .nav-cta { font-size: .75rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; background: var(--orange); color: #fff; padding: 10px 22px; border-radius: 2px; transition: all .3s; border: 1.5px solid var(--orange); }
+    .nav-cta:hover { background: transparent; color: var(--orange); }
+    .ham { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+    .ham span { width: 26px; height: 1.5px; background: var(--cream); display: block; transition: all .3s; }
+
+    /* MOBILE OVERLAY */
+    .mob { position: fixed; inset: 0; z-index: 490; background: rgba(8,8,8,.97); backdrop-filter: blur(20px); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px; opacity: 0; pointer-events: none; transition: opacity .3s; }
+    .mob.open { opacity: 1; pointer-events: all; }
+    .mob a { font-family: var(--font-d); font-size: 3rem; text-transform: uppercase; color: var(--white); transition: color .2s; }
+    .mob a:hover { color: var(--orange); }
+
+    /* HERO */
+    #hero { height: 100vh; position: relative; display: flex; align-items: flex-end; overflow: hidden; }
+    .h-bg { position: absolute; inset: 0; }
+    .h-bg img { width: 100%; height: 115%; object-fit: cover; object-position: center 40%; will-change: transform; }
+    .h-ov { position: absolute; inset: 0; background: linear-gradient(to top, rgba(8,8,8,.97) 0%, rgba(8,8,8,.45) 50%, rgba(8,8,8,.1) 100%); }
+    .h-content { position: relative; z-index: 2; padding: 0 5% 90px; width: 100%; }
+    .h-eye { font-size: .7rem; letter-spacing: .28em; text-transform: uppercase; color: var(--orange); font-weight: 500; margin-bottom: 14px; display: flex; align-items: center; gap: 10px; opacity: 0; transform: translateY(20px); animation: up .6s 1.2s ease forwards; }
+    .h-eye::before { content: ''; width: 28px; height: 1px; background: var(--orange); }
+    .h-h1 { font-family: var(--font-d); font-size: clamp(5rem, 13vw, 12rem); line-height: .9; text-transform: uppercase; color: var(--white); opacity: 0; transform: translateY(50px); animation: up .9s 1.3s cubic-bezier(.16,1,.3,1) forwards; }
+    .h-h1 .l2 { color: var(--orange); display: block; }
+    .h-row { display: flex; align-items: flex-end; justify-content: space-between; margin-top: 24px; opacity: 0; transform: translateY(20px); animation: up .6s 1.6s ease forwards; flex-wrap: wrap; gap: 20px; }
+    .h-sub { font-size: 1rem; color: rgba(240,235,225,.58); font-weight: 300; max-width: 380px; line-height: 1.68; }
+    .h-sub em { color: var(--orange); font-style: normal; font-weight: 500; }
+    .h-ctas { display: flex; gap: 12px; }
+    .btnA { background: var(--orange); color: #fff; font-size: .77rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; padding: 13px 28px; border-radius: 2px; transition: all .3s; border: 1.5px solid var(--orange); }
+    .btnA:hover { background: transparent; color: var(--orange); }
+    .btnB { border: 1.5px solid rgba(255,255,255,.2); color: var(--cream); font-size: .77rem; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; padding: 13px 28px; border-radius: 2px; transition: all .3s; }
+    .btnB:hover { border-color: var(--orange); color: var(--orange); }
+    .scroll-i { position: absolute; bottom: 28px; right: 5%; z-index: 3; display: flex; flex-direction: column; align-items: center; gap: 6px; opacity: 0; animation: up .5s 2s ease forwards; }
+    .scroll-i span { font-size: .58rem; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); writing-mode: vertical-lr; }
+    .scroll-i .sl { width: 1px; height: 50px; background: linear-gradient(var(--orange), transparent); animation: lf 2s ease infinite; }
+    @keyframes lf { 0%,100%{transform:scaleY(.4);opacity:.3}50%{transform:scaleY(1);opacity:1} }
+    @keyframes up { to { opacity: 1; transform: translateY(0); } }
+
+    /* MARQUEE */
+    .mq { background: var(--orange); overflow: hidden; padding: 13px 0; }
+    .mq-t { display: flex; animation: mq 22s linear infinite; width: max-content; }
+    .mq:hover .mq-t { animation-play-state: paused; }
+    .mq-i { font-family: var(--font-d); font-size: 1.1rem; letter-spacing: .07em; color: var(--black); white-space: nowrap; padding: 0 28px; display: flex; align-items: center; gap: 28px; }
+    .mq-i::after { content: '●'; font-size: .45rem; }
+    @keyframes mq { to { transform: translateX(-50%); } }
+
+    /* REVEAL */
+    .rv { opacity: 0; transform: translateY(36px); transition: opacity .75s ease, transform .75s ease; }
+    .rv.on { opacity: 1; transform: translateY(0); }
+    .rl { opacity: 0; transform: translateX(-50px); transition: opacity .75s ease, transform .75s ease; }
+    .rl.on { opacity: 1; transform: translateX(0); }
+    .rr { opacity: 0; transform: translateX(50px); transition: opacity .75s ease, transform .75s ease; }
+    .rr.on { opacity: 1; transform: translateX(0); }
+    .d1 { transition-delay: .1s; }
+    .d2 { transition-delay: .2s; }
+    .d3 { transition-delay: .3s; }
+
+    /* SHARED */
+    .lbl { font-size: .67rem; letter-spacing: .24em; text-transform: uppercase; color: var(--orange); font-weight: 600; margin-bottom: 14px; display: flex; align-items: center; gap: 10px; }
+    .lbl::before { content: ''; width: 22px; height: 1px; background: var(--orange); }
+    .bt { font-family: var(--font-d); font-size: clamp(3rem, 7vw, 7rem); text-transform: uppercase; line-height: .93; letter-spacing: .01em; color: var(--white); }
+    .bt .ac { color: var(--orange); }
+    .divl { width: 36px; height: 2px; background: var(--orange); margin: 22px 0 30px; border-radius: 2px; }
+
+    /* ABOUT */
+    #about { padding: 130px 5%; display: grid; grid-template-columns: 1fr 1fr; gap: 100px; align-items: center; }
+    .a-imgs { position: relative; }
+    .a-main { border-radius: 4px; overflow: hidden; aspect-ratio: 3/4; }
+    .a-main img { width: 100%; height: 100%; object-fit: cover; transition: transform .8s ease; }
+    .a-main:hover img { transform: scale(1.04); }
+    .a-badge { position: absolute; bottom: -22px; right: -22px; background: var(--orange); padding: 26px; border-radius: 4px; }
+    .a-badge .n { font-family: var(--font-d); font-size: 2.6rem; color: #fff; line-height: 1; }
+    .a-badge .t { font-size: .68rem; color: rgba(255,255,255,.8); letter-spacing: .1em; text-transform: uppercase; margin-top: 4px; }
+    .a-text p { color: rgba(240,235,225,.52); font-weight: 300; line-height: 1.85; margin-bottom: 18px; font-size: .96rem; }
+    .a-text p strong { color: var(--cream); font-weight: 500; }
+    .pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 28px; }
+    .pill { border: 1px solid rgba(255,255,255,.1); padding: 7px 16px; border-radius: 40px; font-size: .76rem; color: var(--muted); transition: all .3s; }
+    .pill:hover { border-color: var(--orange); color: var(--cream); }
+
+    /* BAR */
+    #bar { padding: 0 5% 130px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .bar-txt { background: var(--dark2); border-radius: 4px; padding: 60px 52px; display: flex; flex-direction: column; justify-content: center; }
+    .bar-txt p { color: rgba(240,235,225,.5); font-weight: 300; line-height: 1.8; margin-bottom: 16px; font-size: .95rem; }
+    .bar-imgs { display: grid; grid-template-rows: 1fr 1fr; gap: 20px; }
+    .bar-img { border-radius: 4px; overflow: hidden; }
+    .bar-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .7s ease; }
+    .bar-img:hover img { transform: scale(1.05); }
+
+    /* MENU */
+    #menu { padding: 130px 5%; }
+    .m-head { text-align: center; margin-bottom: 52px; }
+    .m-head .lbl { justify-content: center; }
+    .m-head .lbl::before { display: none; }
+    .m-tabs { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin-bottom: 48px; }
+    .tab { font-size: .74rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; padding: 10px 20px; border-radius: 2px; border: 1px solid rgba(255,255,255,.1); color: var(--muted); background: none; cursor: pointer; transition: all .25s; font-family: var(--font-b); }
+    .tab:hover { border-color: var(--orange); color: var(--cream); }
+    .tab.on { background: var(--orange); border-color: var(--orange); color: #fff; }
+    .m-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+    .cat { display: none; }
+    .cat.on { display: contents; }
+    .mc { background: var(--dark2); border: 1px solid rgba(255,255,255,.06); border-radius: 4px; padding: 22px 26px; display: flex; justify-content: space-between; gap: 18px; align-items: flex-start; transition: all .3s; position: relative; overflow: hidden; }
+    .mc::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--orange); transform: scaleY(0); transition: transform .3s; transform-origin: bottom; }
+    .mc:hover::before { transform: scaleY(1); }
+    .mc:hover { border-color: rgba(232,81,26,.2); transform: translateX(4px); }
+    .mc-name { font-family: var(--font-d); font-size: 1.1rem; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 5px; color: var(--white); }
+    .mc-desc { font-size: .8rem; color: var(--muted); font-weight: 300; line-height: 1.5; }
+    .mc-price { font-family: var(--font-d); font-size: 1.35rem; color: var(--orange); white-space: nowrap; flex-shrink: 0; }
+    .m-foot { text-align: center; margin-top: 44px; font-size: .82rem; color: var(--muted); }
+    .m-foot a { color: var(--orange); border-bottom: 1px solid rgba(232,81,26,.3); padding-bottom: 1px; transition: all .3s; }
+    .m-foot a:hover { border-color: var(--orange); }
+
+    /* GALLERY */
+    #gallery { padding: 0 5% 130px; }
+    .g-head { margin-bottom: 44px; }
+    .g-grid { display: grid; grid-template-columns: repeat(12,1fr); grid-template-rows: 260px 260px; gap: 12px; }
+    .gi { border-radius: 4px; overflow: hidden; position: relative; }
+    .gi img { width: 100%; height: 100%; object-fit: cover; transition: transform .7s ease; }
+    .gi:hover img { transform: scale(1.06); }
+    .gi1 { grid-column: 1/6; grid-row: 1/3; }
+    .gi2 { grid-column: 6/9; grid-row: 1/2; }
+    .gi3 { grid-column: 9/13; grid-row: 1/2; }
+    .gi4 { grid-column: 6/13; grid-row: 2/3; }
+    .gi-lbl { position: absolute; bottom: 0; left: 0; right: 0; padding: 36px 18px 14px; background: linear-gradient(transparent, rgba(8,8,8,.65)); font-size: .7rem; letter-spacing: .14em; text-transform: uppercase; color: rgba(255,255,255,.55); opacity: 0; transition: opacity .3s; }
+    .gi:hover .gi-lbl { opacity: 1; }
+    .g-foot { margin-top: 24px; display: flex; justify-content: flex-end; }
+    .ig-btn { display: flex; align-items: center; gap: 10px; font-size: .78rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); border: 1px solid rgba(255,255,255,.1); padding: 11px 22px; border-radius: 2px; transition: all .3s; }
+    .ig-btn:hover { border-color: var(--orange); color: var(--cream); }
+
+    /* STATEMENT */
+    #stmt { padding: 130px 5%; background: var(--dark); text-align: center; }
+    .st-big { font-family: var(--font-d); font-size: clamp(3.5rem, 11vw, 10rem); text-transform: uppercase; line-height: .88; }
+    .st-big .sk { -webkit-text-stroke: 1px rgba(255,255,255,.18); color: transparent; }
+    .st-big .oc { color: var(--orange); }
+    .st-sub { margin: 32px auto 0; font-size: .98rem; color: var(--muted); font-weight: 300; max-width: 460px; line-height: 1.75; }
+    .st-sub em { color: var(--cream); font-style: normal; }
+    .st-stats { display: flex; align-items: center; justify-content: center; gap: 32px; margin-top: 64px; flex-wrap: wrap; }
+    .ss { text-align: center; }
+    .ss-n { font-family: var(--font-d); font-size: 3.5rem; color: var(--orange); line-height: 1; }
+    .ss-l { font-size: .66rem; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); margin-top: 5px; }
+    .ss-sep { width: 1px; height: 56px; background: rgba(255,255,255,.1); }
+
+    /* INFO */
+    #info { padding: 130px 5%; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; }
+    .ht { width: 100%; border-collapse: collapse; }
+    .ht tr { border-bottom: 1px solid rgba(255,255,255,.06); }
+    .ht tr:last-child { border: none; }
+    .ht td { padding: 14px 0; font-size: .88rem; vertical-align: middle; }
+    .ht td:first-child { color: var(--cream); font-weight: 500; width: 110px; text-transform: capitalize; }
+    .ht td:last-child { color: var(--muted); font-weight: 300; text-align: right; font-size: .83rem; }
+    .ht tr.today td { color: var(--orange) !important; }
+    .closed { color: rgba(255,70,70,.55) !important; }
+    .hn { margin-top: 22px; background: var(--dark2); border-left: 2px solid var(--orange); padding: 13px 16px; font-size: .8rem; color: var(--muted); border-radius: 0 4px 4px 0; line-height: 1.6; }
+    .map-b { border-radius: 4px; overflow: hidden; }
+    .map-b iframe { width: 100%; height: 340px; border: 0; display: block; }
+    .map-a { margin-top: 14px; display: flex; gap: 12px; background: var(--dark2); padding: 15px 16px; border-radius: 4px; }
+    .map-a svg { color: var(--orange); flex-shrink: 0; margin-top: 2px; }
+    .map-a-t { font-size: .83rem; line-height: 1.6; }
+    .map-a-t strong { color: var(--white); display: block; }
+    .map-a-t span { color: var(--muted); }
+    .map-a-t a { color: var(--orange); }
+
+    /* FOOTER */
+    footer { background: #050505; padding: 64px 5% 26px; border-top: 1px solid rgba(255,255,255,.06); }
+    .f-top { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 60px; margin-bottom: 48px; }
+    .f-logo img { height: 40px; margin-bottom: 18px; }
+    .f-desc { color: var(--muted); font-size: .83rem; font-weight: 300; line-height: 1.75; margin-bottom: 22px; }
+    .f-soc { display: flex; gap: 10px; }
+    .sc { width: 36px; height: 36px; border-radius: 2px; border: 1px solid rgba(255,255,255,.1); display: flex; align-items: center; justify-content: center; color: var(--muted); transition: all .3s; }
+    .sc:hover { border-color: var(--orange); color: var(--orange); }
+    .f-col h4 { font-size: .7rem; letter-spacing: .18em; text-transform: uppercase; color: var(--white); margin-bottom: 18px; font-weight: 600; }
+    .f-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .f-col ul a { font-size: .83rem; color: var(--muted); transition: color .3s; }
+    .f-col ul a:hover { color: var(--orange); }
+    .cis { display: flex; flex-direction: column; gap: 10px; }
+    .ci { display: flex; gap: 10px; font-size: .81rem; color: var(--muted); align-items: flex-start; }
+    .ci svg { color: var(--orange); flex-shrink: 0; margin-top: 2px; }
+    .ci a { color: var(--orange); }
+    .f-bot { padding-top: 26px; border-top: 1px solid rgba(255,255,255,.06); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+    .f-copy { font-size: .74rem; color: rgba(255,255,255,.2); }
+    .bee { font-size: .72rem; color: rgba(255,255,255,.2); display: flex; align-items: center; gap: 5px; }
+    .bee strong { color: var(--orange); }
+
+    /* MVP BADGE */
+    .mvp { position: fixed; bottom: 22px; right: 22px; z-index: 600; background: rgba(8,8,8,.92); backdrop-filter: blur(16px); border: 1px solid rgba(232,81,26,.3); border-radius: 2px; padding: 9px 15px; display: flex; align-items: center; gap: 8px; font-size: .7rem; color: rgba(255,255,255,.38); font-family: var(--font-b); }
+    .mvp strong { color: var(--orange); }
+    .mvp-d { width: 5px; height: 5px; border-radius: 50%; background: var(--orange); animation: pl 2s infinite; }
+    @keyframes pl { 0%,100%{opacity:1}50%{opacity:.25} }
+
+    /* RESPONSIVE */
+    /* ── TABLET (≤960px) ── */
+    @media (max-width: 960px) {
+      #about { grid-template-columns: 1fr; gap: 48px; padding: 80px 5%; }
+      .a-imgs { max-width: 480px; }
+      .a-main { aspect-ratio: 16/9; }
+      .a-badge { bottom: -16px; right: 0; padding: 18px 22px; }
+      .a-badge .n { font-size: 2rem; }
+      #bar { grid-template-columns: 1fr; padding: 0 5% 80px; }
+      .bar-txt { padding: 44px 36px; }
+      .bar-imgs { grid-template-columns: 1fr 1fr; grid-template-rows: 240px; }
+      .g-grid { grid-template-columns: 1fr 1fr; grid-template-rows: auto; }
+      .gi1,.gi2,.gi3,.gi4 { grid-column: auto; grid-row: auto; height: 220px; }
+      #info { grid-template-columns: 1fr; gap: 56px; padding: 80px 5%; }
+      .f-top { grid-template-columns: 1fr; gap: 36px; }
+      #menu { padding: 80px 5%; }
+      #gallery { padding: 0 5% 80px; }
+      #stmt { padding: 80px 5%; }
+      .nav-links,.nav-cta { display: none; }
+      .ham { display: flex; }
+      #cur,#cur-r { display: none; }
+      body { cursor: auto; }
+    }
+
+    /* ── MOBILE (≤600px) ── */
+    @media (max-width: 600px) {
+      nav { padding: 16px 5%; }
+      .nav-logo img { height: 28px; }
+
+      /* hero */
+      #hero { height: 100svh; min-height: 600px; align-items: flex-end; }
+      .h-bg img { height: 100%; object-position: center center; transform: scale(1.9); transform-origin: center 62%; }
+      .h-ov { background: linear-gradient(to top, rgba(8,8,8,.97) 0%, rgba(8,8,8,.55) 45%, rgba(8,8,8,.35) 100%); }
+      .h-content { padding: 0 5% 56px; }
+      .h-eye { font-size: .62rem; letter-spacing: .18em; }
+      .h-h1 { font-size: clamp(3.8rem, 17vw, 6rem); line-height: .88; }
+      .h-row { flex-direction: column; gap: 16px; align-items: flex-start; }
+      .h-sub { font-size: .9rem; max-width: 100%; }
+      .h-ctas { width: 100%; }
+      .btnA, .btnB { flex: 1; text-align: center; padding: 13px 16px; font-size: .72rem; }
+      .scroll-i { display: none; }
+
+      /* marquee */
+      .mq-i { font-size: .95rem; padding: 0 20px; }
+
+      /* about */
+      #about { padding: 64px 5%; gap: 40px; }
+      .a-badge { right: 0; bottom: -12px; padding: 14px 18px; }
+      .a-badge .n { font-size: 1.6rem; }
+      .pills { gap: 6px; }
+      .pill { font-size: .72rem; padding: 6px 12px; }
+
+      /* bar */
+      #bar { padding: 0 5% 64px; }
+      .bar-txt { padding: 36px 24px; }
+      .bar-imgs { grid-template-columns: 1fr; grid-template-rows: 220px 220px; }
+
+      /* menu */
+      #menu { padding: 64px 5%; }
+      .m-tabs { gap: 4px; }
+      .tab { font-size: .68rem; padding: 8px 14px; letter-spacing: .06em; }
+      .m-grid { grid-template-columns: 1fr; }
+      .mc { padding: 18px 20px; }
+      .mc-name { font-size: 1rem; }
+      .mc-price { font-size: 1.2rem; }
+
+      /* gallery */
+      #gallery { padding: 0 5% 64px; }
+      .g-grid { grid-template-columns: 1fr; grid-template-rows: auto; gap: 10px; }
+      .gi1,.gi2,.gi3,.gi4 { height: 260px; }
+      .g-foot { justify-content: center; }
+
+      /* statement */
+      #stmt { padding: 64px 5%; }
+      .st-big { font-size: clamp(3rem, 14vw, 5rem); }
+      .st-stats { gap: 20px; }
+      .ss-n { font-size: 2.8rem; }
+      .ss-sep { height: 40px; }
+
+      /* info */
+      #info { padding: 64px 5%; }
+      .map-b iframe { height: 260px; }
+      .ht td { font-size: .82rem; padding: 12px 0; }
+
+      /* footer */
+      footer { padding: 48px 5% 20px; }
+      .f-top { gap: 28px; }
+      .f-logo img { height: 32px; }
+      .f-bot { flex-direction: column; text-align: center; gap: 8px; }
+
+      /* big titles */
+      .bt { font-size: clamp(2.6rem, 10vw, 4.5rem); }
+
+      /* mvp badge */
+      .mvp { bottom: 14px; right: 14px; font-size: .66rem; padding: 7px 12px; }
+    }
+
+    /* ── SMALL (≤380px) ── */
+    @media (max-width: 380px) {
+      .h-h1 { font-size: clamp(3.2rem, 18vw, 5rem); }
+      .h-ctas { flex-direction: column; }
+      .btnA, .btnB { text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- LOADER -->
+  <div id="loader"><img src="soul-logo.webp" alt="Soul Street Burger"/></div>
+
+  <!-- CURSOR -->
+  <div id="cur"></div>
+  <div id="cur-r"></div>
+
+  <!-- MVP BADGE -->
+  <div class="mvp"><div class="mvp-d"></div> MVP por <strong>Bee Digital</strong></div>
+
+  <!-- MOB MENU -->
+  <div class="mob" id="mob">
+    <a href="#about" onclick="closeMob()">Sobre</a>
+    <a href="#menu" onclick="closeMob()">Menu</a>
+    <a href="#gallery" onclick="closeMob()">Galeria</a>
+    <a href="#info" onclick="closeMob()">Localização</a>
+    <a href="https://www.ubereats.com/store/soul-street-burger/ZCd6hnQATSubq8q8Oxi0Jg" target="_blank" rel="noopener noreferrer" style="color:var(--orange)">Order Now</a>
+  </div>
+
+  <!-- NAV -->
+  <nav id="mainNav">
+    <a class="nav-logo" href="#hero"><img src="soul-logo.webp" alt="Soul Street Burger"/></a>
+    <ul class="nav-links">
+      <li><a href="#about">Sobre</a></li>
+      <li><a href="#menu">Menu</a></li>
+      <li><a href="#gallery">Galeria</a></li>
+      <li><a href="#info">Localização</a></li>
+    </ul>
+    <a class="nav-cta" href="https://www.ubereats.com/store/soul-street-burger/ZCd6hnQATSubq8q8Oxi0Jg" target="_blank" rel="noopener noreferrer">Order Now</a>
+    <div class="ham" id="hamBtn"><span></span><span></span><span></span></div>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="h-bg" id="hBg"><img src="photo-hero.png" alt="Soul Street Burger"/></div>
+    <div class="h-ov"></div>
+    <div class="h-content">
+      <p class="h-eye">Guimarães &nbsp;·&nbsp; Since day one</p>
+      <h1 class="h-h1" id="glitch">No Rules.<br/><span class="l2">Só Sabor.</span></h1>
+      <div class="h-row">
+        <p class="h-sub">Hambúrgueres artesanais com <em>alma de rua</em>.<br/>No shortcuts. No bullshit. Just real flavour.</p>
+        <div class="h-ctas">
+          <a class="btnA" href="#menu">Ver Menu</a>
+          <a class="btnB" href="https://www.ubereats.com/store/soul-street-burger/ZCd6hnQATSubq8q8Oxi0Jg" target="_blank" rel="noopener noreferrer">Order Online</a>
+        </div>
+      </div>
+    </div>
+    <div class="scroll-i"><div class="sl"></div><span>Scroll</span></div>
+  </section>
+
+  <!-- MARQUEE -->
+  <div class="mq">
+    <div class="mq-t">
+      <span class="mq-i">Soul Street Burger</span><span class="mq-i">Guimarães</span><span class="mq-i">Artisan Burgers</span><span class="mq-i">Feito com Alma</span><span class="mq-i">No Shortcuts</span><span class="mq-i">Real Flavour</span><span class="mq-i">Built Different</span><span class="mq-i">Est. Guimarães</span>
+      <span class="mq-i">Soul Street Burger</span><span class="mq-i">Guimarães</span><span class="mq-i">Artisan Burgers</span><span class="mq-i">Feito com Alma</span><span class="mq-i">No Shortcuts</span><span class="mq-i">Real Flavour</span><span class="mq-i">Built Different</span><span class="mq-i">Est. Guimarães</span>
+    </div>
+  </div>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="a-imgs rl">
+      <div class="a-main"><img src="photo-boxes.png" alt="Soul Street Burger branding"/></div>
+      <div class="a-badge"><div class="n">4.7★</div><div class="t">500+ Reviews</div></div>
+    </div>
+    <div class="a-text">
+      <p class="lbl rv">A Nossa História</p>
+      <h2 class="bt rv">Not just food.<br/><span class="ac">It's a statement.</span></h2>
+      <div class="divl rv"></div>
+      <p class="rv">Nascemos em Guimarães com uma missão simples: <strong>fazer diferente</strong>. Cada hambúrguer é uma declaração — de qualidade, de atitude, de respeito por quem come.</p>
+      <p class="rv d1">We don't do ordinary. Ingredientes frescos, receitas próprias, e aquele <strong>sabor que fica na memória</strong>. É comida com carácter.</p>
+      <p class="rv d2">Com mais de 500 avaliações e 4.7 estrelas, a comunidade Soul fala por si. <strong>Vem provar do que é feito.</strong></p>
+      <div class="pills rv d3">
+        <span class="pill">🥩 Fresh daily</span>
+        <span class="pill">🍞 Pão artesanal</span>
+        <span class="pill">🔥 Feito na hora</span>
+        <span class="pill">🌿 Opção veggie</span>
+        <span class="pill">🍹 Full bar</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- BAR -->
+  <section id="bar">
+    <div class="bar-txt rl">
+      <p class="lbl">The Bar</p>
+      <h2 class="bt">And yes,<br/><span class="ac">we have<br/>a bar.</span></h2>
+      <div class="divl"></div>
+      <p>Porque uma boa refeição merece o acompanhamento certo. Cocktails crafted com a mesma atenção ao detalhe que pomos em cada burger.</p>
+      <p>Ambiente escuro, música no ponto, e um drink na mão. <strong style="color:var(--cream)">This is the vibe.</strong></p>
+    </div>
+    <div class="bar-imgs rr">
+      <div class="bar-img"><img src="photo-cocktail1.png" alt="Cocktails"/></div>
+      <div class="bar-img"><img src="photo-cocktail2.png" alt="Bar"/></div>
+    </div>
+  </section>
+
+  <!-- MENU -->
+  <section id="menu">
+    <div class="m-head">
+      <p class="lbl rv">O que temos para ti</p>
+      <h2 class="bt rv">The <span class="ac">Menu.</span></h2>
+    </div>
+    <div class="m-tabs rv">
+      <button class="tab on" data-t="burgers">Burgers</button>
+      <button class="tab" data-t="combos">Combos</button>
+      <button class="tab" data-t="starters">Entradas</button>
+      <button class="tab" data-t="sides">Acompanhamentos</button>
+      <button class="tab" data-t="drinks">Bebidas</button>
+      <button class="tab" data-t="sauces">Molhos</button>
+    </div>
+    <div class="m-grid">
+      <div class="cat on" id="cat-burgers">
+        <div class="mc rv"><div><div class="mc-name">Chico Fininho</div><div class="mc-desc">O clássico da casa — simples, direto, irresistível.</div></div><div class="mc-price">€11,50</div></div>
+        <div class="mc rv d1"><div><div class="mc-name">GBA</div><div class="mc-desc">Sabores intensos. Built to impress.</div></div><div class="mc-price">€13,20</div></div>
+        <div class="mc rv d2"><div><div class="mc-name">Crispy Chicken</div><div class="mc-desc">Frango crocante com o toque Soul.</div></div><div class="mc-price">€11,50</div></div>
+        <div class="mc rv d3"><div><div class="mc-name">Veggie</div><div class="mc-desc">Plant-based. Full flavour. No compromise.</div></div><div class="mc-price">€10,00</div></div>
+        <div class="mc rv"><div><div class="mc-name">Soul</div><div class="mc-desc">A assinatura. O burger que define quem somos.</div></div><div class="mc-price">€12,20</div></div>
+        <div class="mc rv d1"><div><div class="mc-name">It's Not a Burger</div><div class="mc-desc">Surpreende-te. É tudo o que esperavas — e mais.</div></div><div class="mc-price">€11,50</div></div>
+      </div>
+      <div class="cat" id="cat-combos">
+        <div class="mc rv"><div><div class="mc-name">Chico Fininho + Cheddar e Bacon</div><div class="mc-desc">O duo perfeito para um almoço completo.</div></div><div class="mc-price">€16,00</div></div>
+        <div class="mc rv d1"><div><div class="mc-name">GBA + Gomos do Campo</div><div class="mc-desc">Intenso com o toque rústico dos gomos.</div></div><div class="mc-price">€15,50</div></div>
+        <div class="mc rv d2"><div><div class="mc-name">Crispy Chicken + Batata Trufada</div><div class="mc-desc">The premium combo. Crocante e luxuoso.</div></div><div class="mc-price">€17,00</div></div>
+      </div>
+      <div class="cat" id="cat-starters">
+        <div class="mc rv"><div><div class="mc-name">Pão Queijo e Mel</div><div class="mc-desc">Sweet meets salty. A entrada que prende.</div></div><div class="mc-price">€6,00</div></div>
+        <div class="mc rv d1"><div><div class="mc-name">Nachos c/ Guacamole</div><div class="mc-desc">Crocantes, frescos, impossible to resist.</div></div><div class="mc-price">€9,00</div></div>
+        <div class="mc rv d2"><div><div class="mc-name">Aros de Cebola</div><div class="mc-desc">Dourados, macios, perfeitos.</div></div><div class="mc-price">€6,50</div></div>
+        <div class="mc rv d3"><div><div class="mc-name">Chicken Wings</div><div class="mc-desc">Tempero da casa. Sem moderação.</div></div><div class="mc-price">€8,50</div></div>
+        <div class="mc rv"><div><div class="mc-name">Crocante de Queijo</div><div class="mc-desc">Para os cheese lovers. Pure addiction.</div></div><div class="mc-price">€6,00</div></div>
+      </div>
+      <div class="cat" id="cat-sides">
+        <div class="mc rv"><div><div class="mc-name">Batata Sal e Orégãos</div><div class="mc-desc">O clássico que nunca falha.</div></div><div class="mc-price">€3,00</div></div>
+        <div class="mc rv d1"><div><div class="mc-name">Gomos do Campo</div><div class="mc-desc">Rústicos e cheios de sabor.</div></div><div class="mc-price">€3,90</div></div>
+        <div class="mc rv d2"><div><div class="mc-name">Batata Cheddar e Bacon</div><div class="mc-desc">When the side steals the show.</div></div><div class="mc-price">€5,50</div></div>
+        <div class="mc rv d3"><div><div class="mc-name">Batata Trufada</div><div class="mc-desc">Premium level. Trufa a sério.</div></div><div class="mc-price">€7,00</div></div>
+      </div>
+      <div class="cat" id="cat-drinks">
+        <div class="mc rv"><div><div class="mc-name">Coca-Cola / Zero</div><div class="mc-desc">O parceiro clássico.</div></div><div class="mc-price">€3,00</div></div>
+        <div class="mc rv d1"><div><div class="mc-name">7Up / Sumol / Ice Tea</div><div class="mc-desc">Para todos os gostos.</div></div><div class="mc-price">€3,00</div></div>
+        <div class="mc rv d2"><div><div class="mc-name">Cerveja Premium</div><div class="mc-desc">Bohemia · 1906 · Alhambra. Pick your poison.</div></div><div class="mc-price">€3,20–€4,00</div></div>
+        <div class="mc rv d3"><div><div class="mc-name">Água</div><div class="mc-desc">Natural ou com gás.</div></div><div class="mc-price">€2,00</div></div>
+      </div>
+      <div class="cat" id="cat-sauces">
+        <div class="mc rv"><div><div class="mc-name">Molho Soul</div><div class="mc-desc">The secret. Once you try, no going back.</div></div><div class="mc-price">€0,70</div></div>
+        <div class="mc rv d1"><div><div class="mc-name">Maionese de Alho</div><div class="mc-desc">Cremosa com o punch certo.</div></div><div class="mc-price">€0,60</div></div>
+        <div class="mc rv d2"><div><div class="mc-name">Mostarda / Ketchup</div><div class="mc-desc">Os clássicos sem explicação necessária.</div></div><div class="mc-price">€0,50</div></div>
+        <div class="mc rv d3"><div><div class="mc-name">Barbecue</div><div class="mc-desc">Fumado, doce, viciante.</div></div><div class="mc-price">€0,70</div></div>
+      </div>
+    </div>
+    <div class="m-foot rv">Menu completo no <a href="https://www.ubereats.com/store/soul-street-burger/ZCd6hnQATSubq8q8Oxi0Jg" target="_blank" rel="noopener noreferrer">Uber Eats →</a></div>
+  </section>
+
+  <!-- GALLERY -->
+  <section id="gallery">
+    <div class="g-head">
+      <p class="lbl rv">Visual Soul</p>
+      <h2 class="bt rv">A Brand that<br/><span class="ac">looks the part.</span></h2>
+    </div>
+    <div class="g-grid rv">
+      <div class="gi gi1"><img src="photo-burger.png" alt="The Burger"/><div class="gi-lbl">The Burger</div></div>
+      <div class="gi gi2"><img src="photo-boxes.png" alt="The Brand"/><div class="gi-lbl">The Brand</div></div>
+      <div class="gi gi3"><img src="photo-cocktail2.png" alt="The Bar"/><div class="gi-lbl">The Bar</div></div>
+      <div class="gi gi4"><img src="photo-cocktail1.png" alt="Craft Cocktails"/><div class="gi-lbl">Craft Cocktails</div></div>
+    </div>
+    <div class="g-foot rv">
+      <a class="ig-btn" href="https://www.instagram.com/soulstreetburger/" target="_blank" rel="noopener noreferrer">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>
+        @soulstreetburger
+      </a>
+    </div>
+  </section>
+
+  <!-- STATEMENT -->
+  <section id="stmt">
+    <div class="rv">
+      <div class="st-big">
+        <span class="sk">Built</span><br/>
+        <span class="oc">with soul.</span><br/>
+        <span class="sk">Served</span><br/>
+        with fire.
+      </div>
+    </div>
+    <p class="st-sub rv">A comida que fazemos é um reflexo de quem somos. <em>Raw, real, e sem filtros.</em> Vem comer — ou pede já.</p>
+    <div class="st-stats rv">
+      <div class="ss"><div class="ss-n">4.7★</div><div class="ss-l">Rating</div></div>
+      <div class="ss-sep"></div>
+      <div class="ss"><div class="ss-n">500+</div><div class="ss-l">Avaliações</div></div>
+      <div class="ss-sep"></div>
+      <div class="ss"><div class="ss-n">100%</div><div class="ss-l">Artesanal</div></div>
+    </div>
+  </section>
+
+  <!-- INFO -->
+  <section id="info">
+    <div>
+      <p class="lbl rv">Quando passas por cá</p>
+      <h2 class="bt rv">Horários.</h2>
+      <div class="divl rv"></div>
+      <table class="ht rv">
+        <tbody>
+          <tr id="r-seg"><td>Segunda</td><td class="closed">Fechado</td></tr>
+          <tr id="r-ter"><td>Terça</td><td>12:00–14:45 · 19:00–22:15</td></tr>
+          <tr id="r-qua"><td>Quarta</td><td>12:00–14:45 · 19:00–22:15</td></tr>
+          <tr id="r-qui"><td>Quinta</td><td>12:00–14:30 · 19:00–22:00</td></tr>
+          <tr id="r-sex"><td>Sexta</td><td>12:00–14:30 · 19:00–23:00</td></tr>
+          <tr id="r-sab"><td>Sábado</td><td>12:00–15:15 · 19:00–23:15</td></tr>
+          <tr id="r-dom"><td>Domingo</td><td>12:30–15:15 · 19:00–22:15</td></tr>
+        </tbody>
+      </table>
+      <div class="hn rv">Horários de entregas via Uber Eats podem variar. Para reservas, liga directamente.</div>
+    </div>
+    <div>
+      <p class="lbl rv">Onde nos encontrar</p>
+      <h2 class="bt rv">Find us.</h2>
+      <div class="divl rv"></div>
+      <div class="map-b rv">
+        <iframe src="https://maps.google.com/maps?q=Alameda+Santo+Damaso+111+Guimaraes+Portugal&output=embed&z=16" allowfullscreen loading="lazy" title="Soul Street Burger"></iframe>
+      </div>
+      <div class="map-a rv">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <div class="map-a-t">
+          <strong>Soul Street Burger</strong>
+          <span>Alameda S. Dâmaso, N.º 111 · 4810-286 Guimarães</span><br/>
+          <a href="tel:+351916129381">+351 916 129 381</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="f-top">
+      <div>
+        <div class="f-logo"><img src="soul-logo.webp" alt="Soul Street Burger"/></div>
+        <p class="f-desc">Hambúrgueres artesanais com alma de rua, no coração de Guimarães.<br/>Built different. Served with pride.</p>
+        <div class="f-soc">
+          <a class="sc" href="https://www.instagram.com/soulstreetburger/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>
+          </a>
+          <a class="sc" href="https://www.ubereats.com/store/soul-street-burger/ZCd6hnQATSubq8q8Oxi0Jg" target="_blank" rel="noopener noreferrer" aria-label="Uber Eats">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8v8"/></svg>
+          </a>
+          <a class="sc" href="tel:+351916129381" aria-label="Telefone">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.67A2 2 0 012 1h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.91 8.91a16 16 0 006.16 6.16l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
+          </a>
+        </div>
+      </div>
+      <div class="f-col">
+        <h4>Navigate</h4>
+        <ul>
+          <li><a href="#about">Sobre Nós</a></li>
+          <li><a href="#menu">Menu</a></li>
+          <li><a href="#gallery">Galeria</a></li>
+          <li><a href="#info">Localização</a></li>
+          <li><a href="https://www.ubereats.com/store/soul-street-burger/ZCd6hnQATSubq8q8Oxi0Jg" target="_blank" rel="noopener noreferrer">Order Online</a></li>
+        </ul>
+      </div>
+      <div class="f-col">
+        <h4>Contacto</h4>
+        <div class="cis">
+          <div class="ci"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg><span>Alameda S. Dâmaso, 111<br/>Guimarães</span></div>
+          <div class="ci"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.67A2 2 0 012 1h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.91 8.91a16 16 0 006.16 6.16l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg><a href="tel:+351916129381">+351 916 129 381</a></div>
+          <div class="ci"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>Seg: Fechado · Ter–Dom: Almoço + Jantar</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="f-bot">
+      <p class="f-copy">© 2024 Soul Street Burger · NIF 517148226 · Todos os direitos reservados</p>
+      <div class="bee">Site MVP por <strong>Bee Digital</strong></div>
+    </div>
+  </footer>
+
+  <script>
+    // LOADER
+    window.addEventListener('load', () => setTimeout(() => document.getElementById('loader').classList.add('out'), 800));
+
+    // CURSOR
+    const cur = document.getElementById('cur'), curR = document.getElementById('cur-r');
+    let mx=0,my=0,rx=0,ry=0;
+    document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; });
+    (function tick(){
+      rx += (mx-rx)*.13; ry += (my-ry)*.13;
+      if(cur){ cur.style.left=mx+'px'; cur.style.top=my+'px'; }
+      if(curR){ curR.style.left=rx+'px'; curR.style.top=ry+'px'; }
+      requestAnimationFrame(tick);
+    })();
+    document.querySelectorAll('a,button,.tab,.mc').forEach(el=>{
+      el.addEventListener('mouseenter',()=>{ if(cur){cur.style.width='20px';cur.style.height='20px';} if(curR){curR.style.width='60px';curR.style.height='60px';curR.style.borderColor='rgba(232,81,26,.8)';} });
+      el.addEventListener('mouseleave',()=>{ if(cur){cur.style.width='12px';cur.style.height='12px';} if(curR){curR.style.width='40px';curR.style.height='40px';curR.style.borderColor='rgba(232,81,26,.5)';} });
+    });
+
+    // NAV
+    window.addEventListener('scroll',()=>document.getElementById('mainNav').classList.toggle('solid',scrollY>80));
+
+    // MOBILE MENU
+    document.getElementById('hamBtn').addEventListener('click',()=>document.getElementById('mob').classList.toggle('open'));
+    function closeMob(){ document.getElementById('mob').classList.remove('open'); }
+
+    // PARALLAX
+    const hBg = document.getElementById('hBg');
+    if (window.innerWidth > 600) {
+      window.addEventListener('scroll',()=>{ if(hBg) hBg.querySelector('img').style.transform=`translateY(${scrollY*.28}px)`; },{passive:true});
+    }
+
+    // SCROLL REVEAL
+    const obs = new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('on'); }),{threshold:.1});
+    document.querySelectorAll('.rv,.rl,.rr').forEach(el=>obs.observe(el));
+
+    // TABS
+    document.querySelectorAll('.tab').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        document.querySelectorAll('.tab').forEach(b=>b.classList.remove('on'));
+        document.querySelectorAll('.cat').forEach(c=>c.classList.remove('on'));
+        btn.classList.add('on');
+        document.getElementById('cat-'+btn.dataset.t).classList.add('on');
+      });
+    });
+
+    // TODAY
+    const days=['dom','seg','ter','qua','qui','sex','sab'];
+    const tr=document.getElementById('r-'+days[new Date().getDay()]);
+    if(tr) tr.classList.add('today');
+
+    // GLITCH
+    const g=document.getElementById('glitch');
+    if(g){ setInterval(()=>{ g.style.textShadow=`${(Math.random()-.5)*8}px 0 var(--orange),${(Math.random()-.5)*8}px 0 rgba(255,255,255,.5)`; setTimeout(()=>g.style.textShadow='none',90); },3800); }
+  </script>
+</body>
+</html>
